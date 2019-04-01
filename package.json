@@ -5,8 +5,9 @@
         "body-parser": "~1.18.3",
         "cookie-session": "~1.3.3",
         "express": "~4.16.4",
-        "express-handlebars": "^3.0.2"
+        "express-handlebars": "~3.0.2",
+        "socket.io": "~2.2.0"
     },
     "author": "Xifly <alexandre.joron@protonmail.com>",
-    "description": "Un gestionnaire de todolist ultra basique"
+    "description": "Exercices du cours \"Des applications ultra-rapides avec Node.js\" proposé par Openclassrooms."
 }

@@ -17,36 +17,45 @@ var list = [];
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
-/* Gestion des routes en-dessous */
+/** Gestion des routes en-dessous **/
 
+/* Affiche la page d'accueil */
+
+app.get('/home', function (req, res) {
+    res.render('home');
+});
+
+/** Partie Todo List **/
+
+/* Affiche la todo list */
 app.get('/todo', function (req, res) {
     res.render('list-view', {list:list});
 });
 
+/* Ajoute une tâche */
 app.post('/todo/ajouter', urlencodedParser, function (req, res) {
-    if (!req.body) return res.sendStatus(400);
-    list.push(req.body.task);
+    if (req.body){
+        list.push(req.body.task);
+    }
     res.redirect('/todo');
 });
 
+/* Supprime une tâche */
 app.get('/todo/supprimer/:id', function (req, res) {
-    
     if(isNumeric(req.params.id)) {
         list.splice(req.params.id, 1);
-        res.redirect('/todo');
-    } else {
-        res.setHeader('Content-Type', 'text/plain');
-        res.status(404).send('L\'identifiant de la tâche à supprimer n\'est pas correcte.');
     }
+    res.redirect('/todo');
 });
 
+/* Gère la redirection en cas d'URL incorrect */
 app.use(function (req, res, next) {
-    res.setHeader('Content-Type', 'text/plain');
-    res.status(404).send('Page introuvable !');
+    res.redirect('/home');
 });
 
 app.listen(8080);
 
+/* Fonction permettant de savoir si une variable est numérique */
 function isNumeric(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
