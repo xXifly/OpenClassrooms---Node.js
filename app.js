@@ -1,32 +1,31 @@
-var express = require('express');
-var session = require('cookie-session'); // Charge le middleware de sessions
-var bodyParser = require('body-parser'); // Charge le middleware de gestion des paramètres
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
-var exphbs  = require('express-handlebars');
-var http = require('http');
-var fs = require('fs');
-ent = require('ent');
+var express    = require('express');
+var session    = require("express-session");
+var RedisStore = require("connect-redis")(session);
+var bodyParser = require('body-parser');
+var exphbs     = require('express-handlebars');
+var http       = require('http');
+var fs         = require('fs');
+var ent        = require('ent');
 
-var app = express();
+var app    = express();
 var server = require('http').createServer(app);
+var io     = require('socket.io')(server);
+var ios    = require('socket.io-express-session');
 
-// Chargement de socket.io
-var io = require('socket.io').listen(server);
+var sessionMiddleware = session({
+    secret: "my-secret",
+    resave: true,
+    saveUninitialized: true
+});
 
-/* On utilise les sessions */
-app.use(session({ secret: 'todotopsecret' }))
 
-
-/* S'il n'y a pas de todolist dans la session,
-on en crée une vide sous forme d'array avant la suite */
-.use(function(req, res, next){
-    if (typeof(req.session.list) == 'undefined') {
-        req.session.list = [];
-    }
-    req.session.pseudo;
-    next();
-})
-
+// On attache notre session
+app.use(sessionMiddleware);
+// On passe notre session à socket.io
+io.use(ios(sessionMiddleware));
+// On applique le parseur de formulaire
+app.use(bodyParser.urlencoded({ extended: false }));
+// On met en place l'uilisate des template hundlebars
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
@@ -35,18 +34,18 @@ app.set('view engine', 'handlebars');
 /* Affiche la page d'accueil */
 
 app.get('/home', function (req, res) {
-    res.render('home');
+    res.render('home', {pseudo:req.session.pseudo});
 });
 
 /** Partie Todo List **/
 
 /* Affiche la todo list */
 app.get('/todo', function (req, res) {
-    res.render('list-view', {list:req.session.list});
+    res.render('list-view', {list:req.session.list, pseudo:req.session.pseudo});
 });
 
 /* Ajoute une tâche */
-app.post('/todo/ajouter', urlencodedParser, function (req, res) {
+app.post('/todo/ajouter', function (req, res) {
     if (req.body && req.body.task != ""){
         req.session.list.push(req.body.task);
     }
@@ -68,23 +67,24 @@ app.get('/chat', function (req, res) {
     if(req.session.pseudo){
         res.render('chat', {pseudo:req.session.pseudo}); 
     } else {
-        res.redirect('/chat/connexion');
+        res.redirect('/chat/connection');
     }
 });
 
 /* Affiche le formulaire de connection au chat */
-app.get('/chat/connexion', function (req, res) {
+app.get('/chat/connection', function (req, res) {
     res.render('connexion');
 });
 
-app.post('/chat/connexion/new', urlencodedParser, function (req, res) {
+app.post('/chat/connection/new', function (req, res) {
     req.session.pseudo = req.body.pseudo;
     res.redirect('/chat');
 });
 
 /* Envoie un message */
-app.get('/chat/envoie', function (req, res) {
-    
+app.post('/chat/disconnection', function (req, res) {
+    req.session.pseudo = '';
+    res.redirect('/home');
 });
 
 /* Gère la redirection en cas d'URL incorrect */
@@ -95,11 +95,22 @@ app.use(function (req, res, next) {
 
 
 io.sockets.on('connection', function (socket) {
+    
+    socket.emit('pseudo',socket.handshake.session.pseudo)
 
-    socket.on('new-connexion', function(pseudo) {
-        socket.pseudo = ent.encode(pseudo);
+    socket.on('login', function(pseudo) {
+        socket.handshake.session.pseudo = pseudo;
+        socket.handshake.session.save();
         console.log(pseudo + " viens de se connecter.");
     });
+
+    socket.on('logout', function(pseudo) {
+        if (socket.handshake.session.pseudo) {
+            delete socket.handshake.session.pseudo;
+            socket.handshake.session.save();
+        }
+    });
+
 
     socket.on('new-message', function(message) {
         socket.broadcast.emit('new-message', {pseudo: socket.pseudo, message: ent.encode(message)});
