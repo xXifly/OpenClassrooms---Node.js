@@ -5,9 +5,13 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 var exphbs  = require('express-handlebars');
 var http = require('http');
 var fs = require('fs');
+ent = require('ent');
 
 var app = express();
+var server = require('http').createServer(app);
 
+// Chargement de socket.io
+var io = require('socket.io').listen(server);
 
 /* On utilise les sessions */
 app.use(session({ secret: 'todotopsecret' }))
@@ -19,6 +23,7 @@ on en crée une vide sous forme d'array avant la suite */
     if (typeof(req.session.list) == 'undefined') {
         req.session.list = [];
     }
+    req.session.pseudo;
     next();
 })
 
@@ -60,20 +65,21 @@ app.get('/todo/supprimer/:id', function (req, res) {
 
 /* Affiche le chat */
 app.get('/chat', function (req, res) {
-    if (typeof(req.session.chat) == 'undefined') {
-        res.render('connexion');
+    if(req.session.pseudo){
+        res.render('chat', {pseudo:req.session.pseudo}); 
     } else {
-        res.render('chat', {chat:chat});
+        res.redirect('/chat/connexion');
     }
 });
 
-/* Permet la connection au chat */
+/* Affiche le formulaire de connection au chat */
 app.get('/chat/connexion', function (req, res) {
-    if (typeof(req.session.chat) != 'undefined') {
-        res.render('chat', {chat:chat});
-    } else {
-        res.render('connexion');
-    }
+    res.render('connexion');
+});
+
+app.post('/chat/connexion/new', urlencodedParser, function (req, res) {
+    req.session.pseudo = req.body.pseudo;
+    res.redirect('/chat');
 });
 
 /* Envoie un message */
@@ -86,9 +92,26 @@ app.use(function (req, res, next) {
     res.redirect('/home');
 });
 
-app.listen(8080);
+
+
+io.sockets.on('connection', function (socket) {
+
+    socket.on('new-connexion', function(pseudo) {
+        socket.pseudo = ent.encode(pseudo);
+        console.log(pseudo + " viens de se connecter.");
+    });
+
+    socket.on('new-message', function(message) {
+        socket.broadcast.emit('new-message', {pseudo: socket.pseudo, message: ent.encode(message)});
+    });
+
+});
+
+
+server.listen(8080);
 
 /* Fonction permettant de savoir si une variable est numérique */
 function isNumeric(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
+

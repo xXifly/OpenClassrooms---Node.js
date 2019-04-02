@@ -2,8 +2,37 @@
 
 <div>
 	<ul class="list-group">
-	    {{#each chat}}
-	        <li class="list-group-item">{{this}}</li>
-	    {{/each}}
+
 	</ul>
 </div>
+
+<div>
+	<form>
+		<div class="form-group">
+		    <label for="message">{{pseudo}} | Ajouter un message :</label>
+		    <input id="message" class="form-control" type="text" name="message"></input>
+		</div>
+	    <input type="button" id="submit" class="btn btn-primary" value="Envoyer"/>
+	</form>
+</div>
+
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+	var socket = io.connect('http://localhost:8080');
+	var pseudo = "{{pseudo}}";
+
+	socket.emit('new-connexion', pseudo);
+    
+    $("#submit").click(function(){
+    	var message = $("#message").val();
+    	socket.emit('new-message', message);
+    	$(".list-group").prepend("<li class=\"list-group-item\"><span>"+ pseudo +" : </span>"+ message +"</li>");
+    	$('#message').val('').focus();
+    });
+
+    socket.on('new-message',function(data){
+		$(".list-group").prepend("<li class=\"list-group-item\"><span>"+ data.pseudo +" : </span>"+ data.message +"</li>");
+    });
+
+</script>
