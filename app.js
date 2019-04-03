@@ -99,13 +99,17 @@ io.sockets.on('connection', function (socket) {
     socket.emit('pseudo',socket.handshake.session.pseudo)
 
     socket.on('login', function(pseudo) {
-        socket.handshake.session.pseudo = pseudo;
-        socket.handshake.session.save();
-        console.log(pseudo + " viens de se connecter.");
+        if(pseudo != ''){
+            console.log(pseudo + " viens de se connecter.");
+            socket.handshake.session.pseudo = pseudo;
+            socket.handshake.session.save();
+        }
+
     });
 
     socket.on('logout', function(pseudo) {
         if (socket.handshake.session.pseudo) {
+            console.log(pseudo + " viens de se déconnecter.");
             delete socket.handshake.session.pseudo;
             socket.handshake.session.save();
         }

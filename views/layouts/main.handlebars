@@ -2,13 +2,13 @@
 <html lang="fr">
 <head>
   <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Node.js test</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <title>Node.js test</title>
 </head>
 <body>
 
@@ -23,16 +23,16 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active"><a class="nav-link" href="/">Accueil <span class="sr-only">(current)</span></a></li>
-        <li class="nav-item"><a class="nav-link" href="/todo">Todo List</a></li>
-        <li class="nav-item"><a class="nav-link" href="/chat">Super Chat</a></li>
+        <li class="nav-item" style="display: none;"><a class="nav-link" href="/todo">Todo List</a></li>
+        <li class="nav-item" style="display: none;"><a class="nav-link" href="/chat">Super Chat</a></li>
       </ul>
-      <div class="connexion-form" style="display: none;">
+      <div class="connexion-form" style="display: none;" action="/" method="post">
         <form id="connexion-form" class="form-inline my-2 my-lg-0">
           <input id="pseudo" class="form-control mr-sm-2" name="pseudo" type="text" placeholder="Pseudo" aria-label="Pseudo">
           <input id="login" class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Connexion"/>
         </form>
       </div>
-      <div class="disconnection-form" style="display: none;">
+      <div class="disconnection-form" style="display: none;" action="/" method="post">
         <form id="disconnection-form" class="form-inline my-2 my-lg-0">
           <label id="pDisplay" class="form-control mr-sm-2" for="pseudo"></label>
           <input id="logout" class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Déconnexion"/>
@@ -42,36 +42,41 @@
   </nav>
 
   <div class="container">
-   
-      {{{body}}}
+
+    {{{body}}}
 
   </div>
 
   <!-- jQuery et Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      var socket = io.connect('http://localhost:8080');
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
 
-      socket.on('pseudo',function(pseudo){
-        if(pseudo){
-          $("#pDisplay").prepend(pseudo);
-          $(".connexion-form").hide();
-          $(".disconnection-form").show();
-        } else {
-          $(".connexion-form").show();
-          $(".disconnection-form").hide();
-        }
-      });
+    var socket = io.connect('http://localhost:8080');
+    var mPseudo;
 
-      $("#connexion-form").submit(function(){
-        socket.emit('login', $("#pseudo").val() );
-      });
+    socket.on('pseudo',function(pseudo){
+      console.log("Pseudo reçu : " + pseudo);
+      mPseudo = pseudo;
+      if(pseudo){
+        $("#pDisplay").prepend(pseudo);
+        $(".connexion-form").hide();
+        $(".disconnection-form").show();
+        $(".nav-item").show();
+      } else {
+        $(".connexion-form").show();
+        $(".disconnection-form").hide();
+      }
+    });
 
-      $("#disconnection-form").submit(function(){
-        socket.emit('logout', $("#pseudo").val() );
-      });
-    </script>
+    $("#connexion-form").click(function(){
+      socket.emit('login', $("#pseudo").val() );
+    });
+
+    $("#disconnection-form").click(function(){
+      socket.emit('logout', mPseudo);
+    });
+  </script>
 </body>
 </html>
