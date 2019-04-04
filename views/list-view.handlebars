@@ -1,19 +1,26 @@
-<h1>Ma todolist</h1>
+<div id="todo">
 
-<div>
-	<ul class="list-group">
-	    {{#each list}}
-	        <li class="list-group-item"> <a href="/todo/supprimer/{{@index}}">✘</a>  {{this}}</li>
-	    {{/each}}
-	</ul>
-</div>
+	<h1>Ma todolist</h1>
 
-<div>
-	<form  action="/todo/ajouter" method="post">
-		<div class="form-group">
-		    <label for="task">Que dois-je faire ?</label>
-		    <input id="task" class="form-control" type="text" name="task" placeholder="Entrer une tâche"></input>
+	<div class="card">
+		<div class="card-header">
+			Mes tâches :
 		</div>
-	    <button type="submit" class="btn btn-primary">Valider</button>
-	</form>
+		<ul class="list-group list-group-flush">
+			{{#each list}}
+				<li class="list-group-item"> <a href="/todo/supprimer/{{@index}}">✘</a>  {{this}}</li>
+			{{/each}}
+		</ul>
+	</div>
+
+	<div>
+		<form  action="/todo/ajouter" method="post">
+			<div class="form-group">
+				<label for="task">Que dois-je faire ?</label>
+				<input id="task" class="form-control" type="text" name="task" placeholder="Entrer une tâche"></input>
+			</div>
+			<button type="submit" class="btn btn-primary">Valider</button>
+		</form>
+	</div>
+
 </div>

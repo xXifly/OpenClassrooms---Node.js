@@ -4,6 +4,7 @@ var RedisStore = require("connect-redis")(session);
 var bodyParser = require('body-parser');
 var exphbs     = require('express-handlebars');
 var http       = require('http');
+var path       = require('path');
 var fs         = require('fs');
 var ent        = require('ent');
 
@@ -29,6 +30,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
+//Permet la lecture des fichiers css, js et des photos
+app.use(express.static(path.join(__dirname, 'public')));
+
 /** Gestion des routes en-dessous **/
 
 /* Affiche la page d'accueil */
@@ -41,23 +45,35 @@ app.get('/home', function (req, res) {
 
 /* Affiche la todo list */
 app.get('/todo', function (req, res) {
-    res.render('list-view', {list:req.session.list, pseudo:req.session.pseudo});
+    if(req.session.pseudo){
+        res.render('list-view', {list:req.session.list, pseudo:req.session.pseudo});
+    } else {
+        res.redirect('/home');
+    }
 });
 
 /* Ajoute une tâche */
 app.post('/todo/ajouter', function (req, res) {
-    if (req.body && req.body.task != ""){
-        req.session.list.push(req.body.task);
+    if(req.session.pseudo){
+        if (req.body && req.body.task != ""){
+            req.session.list.push(req.body.task);
+        }
+        res.redirect('/todo');
+    } else {
+        res.redirect('/home');
     }
-    res.redirect('/todo');
 });
 
 /* Supprime une tâche */
 app.get('/todo/supprimer/:id', function (req, res) {
-    if(isNumeric(req.params.id)) {
-        req.session.list.splice(req.params.id, 1);
+    if(req.session.pseudo){
+        if(isNumeric(req.params.id)) {
+            req.session.list.splice(req.params.id, 1);
+        }
+        res.redirect('/todo');
+    } else {
+        res.redirect('/home');
     }
-    res.redirect('/todo');
 });
 
 /** Partie Super Chat **/
@@ -67,25 +83,10 @@ app.get('/chat', function (req, res) {
     if(req.session.pseudo){
         res.render('chat', {pseudo:req.session.pseudo}); 
     } else {
-        res.redirect('/chat/connection');
+        res.redirect('/home');
     }
 });
 
-/* Affiche le formulaire de connection au chat */
-app.get('/chat/connection', function (req, res) {
-    res.render('connexion');
-});
-
-app.post('/chat/connection/new', function (req, res) {
-    req.session.pseudo = req.body.pseudo;
-    res.redirect('/chat');
-});
-
-/* Envoie un message */
-app.post('/chat/disconnection', function (req, res) {
-    req.session.pseudo = '';
-    res.redirect('/home');
-});
 
 /* Gère la redirection en cas d'URL incorrect */
 app.use(function (req, res, next) {
@@ -95,13 +96,14 @@ app.use(function (req, res, next) {
 
 
 io.sockets.on('connection', function (socket) {
-    
+
     socket.emit('pseudo',socket.handshake.session.pseudo)
 
     socket.on('login', function(pseudo) {
         if(pseudo != ''){
             console.log(pseudo + " viens de se connecter.");
-            socket.handshake.session.pseudo = pseudo;
+            socket.handshake.session.pseudo =ent.encode(pseudo);
+            socket.handshake.session.list = [];
             socket.handshake.session.save();
         }
 
@@ -111,13 +113,18 @@ io.sockets.on('connection', function (socket) {
         if (socket.handshake.session.pseudo) {
             console.log(pseudo + " viens de se déconnecter.");
             delete socket.handshake.session.pseudo;
+            delete socket.handshake.session.list;
             socket.handshake.session.save();
         }
     });
 
+    socket.on('new-chat-connexion', function(){
+        console.log(socket.handshake.session.pseudo + " viens de se connecter au chat.");
+        socket.broadcast.emit('new-chat-connexion', socket.handshake.session.pseudo);
+    })
 
     socket.on('new-message', function(message) {
-        socket.broadcast.emit('new-message', {pseudo: socket.pseudo, message: ent.encode(message)});
+        socket.broadcast.emit('new-message', {pseudo: socket.handshake.session.pseudo, message: ent.encode(message)});
     });
 
 });
