@@ -16,8 +16,24 @@ h1 {
 
 #chat .card, #todo .card {
 	height: 50%;
+	margin-bottom: 50px;
 }
 
-#chat .ul, #todo .ul {
+#chat ul, #todo ul {
 	overflow: auto;
+}
+
+#chat .badge {
+	height: 24px;
+    padding: 5px;
+    margin-right: 24px;
+}
+
+#chat .hour {
+	float: right;
+}
+
+#chat .info {
+	color: #7d7d7d;
+    font-style: italic;
 }

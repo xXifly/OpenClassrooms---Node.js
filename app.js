@@ -143,11 +143,14 @@ io.sockets.on('connection', function (socket) {
     })
 
     socket.on('new-task', function(task) {
-        console.log("tache : " + task);
         todolist.push(task);
         socket.broadcast.emit('new-task', ent.encode(task));
     });
 
+    socket.on('list-update',function(list){
+        todolist = list;
+        socket.broadcast.emit('list-update', todolist);
+    });
 });
 
 

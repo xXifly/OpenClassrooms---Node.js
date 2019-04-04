@@ -44,14 +44,19 @@
 
 			$("#send-task").click(function(){
 				var task = $("#task").val();
-				socket.emit('new-task', task);	
 				todolist.push(task);
 				afficherListe(todolist);
 				$('#task').val('').focus();
+				socket.emit('new-task',task);
 			});
 
 			socket.on('new-task',function(task){
 				todolist.push(task);
+				afficherListe(todolist);
+			});
+
+			socket.on('list-update',function(list){
+				todolist = list;
 				afficherListe(todolist);
 			});
 
@@ -75,6 +80,7 @@
 	function remove(index){
 		todolist.splice(index,1);
 		afficherListe(todolist);
+		socket.emit('list-update',todolist);
 	}
 
 </script>
