@@ -19,6 +19,7 @@ var sessionMiddleware = session({
     saveUninitialized: true
 });
 
+var todolist = ["jambon","beurre"];
 
 // On attache notre session
 app.use(sessionMiddleware);
@@ -87,6 +88,15 @@ app.get('/chat', function (req, res) {
     }
 });
 
+/* Affiche le chat */
+app.get('/stodo', function (req, res) {
+    if(req.session.pseudo){
+        res.render('stodo', {pseudo:req.session.pseudo}); 
+    } else {
+        res.redirect('/home');
+    }
+});
+
 
 /* Gère la redirection en cas d'URL incorrect */
 app.use(function (req, res, next) {
@@ -125,6 +135,17 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('new-message', function(message) {
         socket.broadcast.emit('new-message', {pseudo: socket.handshake.session.pseudo, message: ent.encode(message)});
+    });
+
+    socket.on('new-todo-connexion', function(){
+        console.log(socket.handshake.session.pseudo + " viens de se connecter a la todolist.");
+        socket.emit('new-todo-connexion', todolist);
+    })
+
+    socket.on('new-task', function(task) {
+        console.log("tache : " + task);
+        todolist.push(task);
+        socket.broadcast.emit('new-task', ent.encode(task));
     });
 
 });

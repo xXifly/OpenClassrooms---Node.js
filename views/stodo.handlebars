@@ -1,0 +1,80 @@
+<div id="todo">
+
+	<h1>Ma todolist</h1>
+
+	<div class="card">
+		<div class="card-header">
+			Mes tâches :
+		</div>
+		<ul class="list-group list-group-flush">
+
+		</ul>
+	</div>
+
+	<div>
+		<form>
+			<div class="form-group">
+				<label for="task">Que dois-je faire ?</label>
+				<input id="task" class="form-control" type="text" name="task" placeholder="Entrer une tâche"></input>
+			</div>
+			<input id="send-task" class="btn btn-primary" value="Valider"/>
+		</form>
+	</div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+	var socket = io.connect('http://localhost:8080');
+	var todolist = [];
+
+	socket.on('pseudo', function(pseudo) {
+
+		console.log("Arrivé sur la todolist avec le pseudo : " + pseudo);
+
+		socket.emit('new-todo-connexion');
+
+		socket.on('new-todo-connexion', function(nTodolist){
+
+			todolist = nTodolist;
+
+			console.log("Liste : " + todolist);
+
+			afficherListe(todolist);
+
+			$("#send-task").click(function(){
+				var task = $("#task").val();
+				socket.emit('new-task', task);	
+				todolist.push(task);
+				afficherListe(todolist);
+				$('#task').val('').focus();
+			});
+
+			socket.on('new-task',function(task){
+				todolist.push(task);
+				afficherListe(todolist);
+			});
+
+		});
+
+	});
+
+	function getTime(){
+		var dt = new Date();
+		var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+		return time;
+	}
+
+	function afficherListe(list){
+		$( ".list-group" ).empty();
+		$.each(list, function(index,value){
+			$(".list-group").prepend("<li class=\"list-group-item\"><a href=\"#\" onclick=remove("+index+")>✘</a>"+ value +"</li>");
+		})
+	}
+
+	function remove(index){
+		todolist.splice(index,1);
+		afficherListe(todolist);
+	}
+
+</script>
