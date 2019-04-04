@@ -73,7 +73,7 @@
 	function afficherListe(list){
 		$( ".list-group" ).empty();
 		$.each(list, function(index,value){
-			$(".list-group").prepend("<li class=\"list-group-item\"><a href=\"#\" onclick=remove("+index+")>✘</a>"+ value +"</li>");
+			$(".list-group").prepend("<li class=\"list-group-item\"><a class=\"badge badge-danger\" href=\"#\" onclick=remove("+index+")>✘</a>"+ value +"</li>");
 		})
 	}
 
