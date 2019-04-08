@@ -19,7 +19,16 @@ var sessionMiddleware = session({
     saveUninitialized: true
 });
 
-var todolist = ["jambon","beurre"];
+var todolist = [
+  {
+    "task" : "jambon",
+    "done" : false
+  },
+  {
+    "task" : "beurre",
+    "done" : true
+  }
+];
 
 // On attache notre session
 app.use(sessionMiddleware);
@@ -143,7 +152,7 @@ io.sockets.on('connection', function (socket) {
     })
 
     socket.on('new-task', function(task) {
-        todolist.push(task);
+        todolist.push({"task":task,"done":false});
         socket.broadcast.emit('new-task', ent.encode(task));
     });
 
