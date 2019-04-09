@@ -32,8 +32,10 @@
 
 	socket.on('pseudo', function(pseudo) {
 
+		// On informe le serveur d'une nouvelle connexion
 		socket.emit('new-chat-connexion');
 
+		// Gestion de l'emission de message
 		$("#send-message").click(function(){
 			var message = $("#message").val();
 			socket.emit('new-message', message);
@@ -41,10 +43,12 @@
 			$('#message').val('').focus();
 		});
 
+		// Information d'une nouvelle connexion
 		socket.on('new-chat-connexion', function(pseudo){
 			$(".card-content").prepend("<li class=\"list-group-item info\"> " + pseudo + " viens de se connecter.<span class=\"hour\">" + getTime() + "</span></li>");
 		});
 
+		// Gestion de la reception d'un nouveau message
 		socket.on('new-message',function(data){
 			if(data.pseudo!=pseudo){
 				$(".card-content").prepend("<li class=\"list-group-item\"><span class=\"badge badge-primary\"> "+ data.pseudo +" </span>"+ data.message +"<span class=\"hour\">" + getTime() + "</span></li>");
@@ -52,6 +56,7 @@
 		});
 	});
 
+	// Fonction retournant l'heure actuelle
 	function getTime(){
 		var dt = new Date();
 		var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
