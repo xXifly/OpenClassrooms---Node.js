@@ -35,11 +35,15 @@
 		// On informe le serveur d'une nouvelle connexion
 		socket.emit('new-chat-connexion');
 
+		$('#message').val('').focus();
+
 		// Gestion de l'emission de message
 		$("#send-message").click(function(){
 			var message = $("#message").val();
-			socket.emit('new-message', message);
-			$(".card-content").prepend("<li class=\"list-group-item\"><span class=\"badge badge-secondary badge-pseudo\"> "+ pseudo +" </span>"+ message +"<span class=\"hour\">" + getTime() + "</span></li>");
+			if(message && message != ''){
+				socket.emit('new-message', message);
+				$(".card-content").prepend("<li class=\"list-group-item\"><span class=\"badge badge-secondary badge-pseudo\"> "+ pseudo +" </span>"+ message +"<span class=\"hour\">" + getTime() + "</span></li>");
+			}
 			$('#message').val('').focus();
 		});
 
@@ -51,7 +55,7 @@
 		// Gestion de la reception d'un nouveau message
 		socket.on('new-message',function(data){
 			if(data.pseudo!=pseudo){
-				$(".card-content").prepend("<li class=\"list-group-item\"><span class=\"badge badge-primary\"> "+ data.pseudo +" </span>"+ data.message +"<span class=\"hour\">" + getTime() + "</span></li>");
+				$(".card-content").prepend("<li class=\"list-group-item\"><span class=\"badge badge-primary badge-pseudo\"> "+ data.pseudo +" </span>"+ data.message +"<span class=\"hour\">" + getTime() + "</span></li>");
 			}
 		});
 	});

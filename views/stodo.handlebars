@@ -36,16 +36,19 @@
 
 		socket.on('new-todo-connexion', function(nTodolist){
 
-
 			todolist = nTodolist;
 
 			afficherListe(todolist);
 
+			$('#task').val('').focus();
+			
 			// Gestion de l'ajout d'une tâche
 			$("#send-task").click(function(){
 				var task = $("#task").val();
+				if(task && task != ''){
+					socket.emit('new-task',task);
+				}
 				$('#task').val('').focus();
-				socket.emit('new-task',task);
 			});
 
 			// Gestion de la reception d'une nouvelle todolist
