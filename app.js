@@ -56,7 +56,7 @@ app.get('/home', function (req, res) {
 /* Affiche la todo list */
 app.get('/todo', function (req, res) {
     if(req.session.pseudo){
-        res.render('list-view', {list:req.session.list, pseudo:req.session.pseudo});
+        res.render('todo', {list:req.session.list, pseudo:req.session.pseudo});
     } else {
         res.redirect('/home');
     }
@@ -120,7 +120,6 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('login', function(pseudo) {
         if(pseudo != ''){
-            console.log(pseudo + " viens de se connecter.");
             socket.handshake.session.pseudo =ent.encode(pseudo);
             socket.handshake.session.list = [];
             socket.handshake.session.save();
@@ -130,7 +129,6 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('logout', function(pseudo) {
         if (socket.handshake.session.pseudo) {
-            console.log(pseudo + " viens de se déconnecter.");
             delete socket.handshake.session.pseudo;
             delete socket.handshake.session.list;
             socket.handshake.session.save();
@@ -138,7 +136,6 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('new-chat-connexion', function(){
-        console.log(socket.handshake.session.pseudo + " viens de se connecter au chat.");
         socket.broadcast.emit('new-chat-connexion', socket.handshake.session.pseudo);
     })
 
@@ -147,7 +144,6 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('new-todo-connexion', function(){
-        console.log(socket.handshake.session.pseudo + " viens de se connecter a la todolist.");
         socket.emit('new-todo-connexion', todolist);
     })
 

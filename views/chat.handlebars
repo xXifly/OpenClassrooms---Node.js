@@ -1,4 +1,4 @@
-<div id="chat">
+<div id="chat" class="container">
 
 	<h1>Super Chat</h1>
 
@@ -6,7 +6,7 @@
 		<div class="card-header">
 			Messages :
 		</div>
-		<ul class="list-group list-group-flush">
+		<ul class="card-content list-group list-group-flush">
 
 		</ul>
 	</div>
@@ -26,6 +26,8 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+	$("#nav-chat").addClass("active");
+
 	var socket = io.connect('http://localhost:8080');
 
 	socket.on('pseudo', function(pseudo) {
@@ -35,17 +37,17 @@
 		$("#send-message").click(function(){
 			var message = $("#message").val();
 			socket.emit('new-message', message);
-			$(".list-group").prepend("<li class=\"list-group-item\"><span class=\"badge badge-secondary\"> "+ pseudo +" </span>"+ message +"<span class=\"hour\">" + getTime() + "</span></li>");
+			$(".card-content").prepend("<li class=\"list-group-item\"><span class=\"badge badge-secondary badge-pseudo\"> "+ pseudo +" </span>"+ message +"<span class=\"hour\">" + getTime() + "</span></li>");
 			$('#message').val('').focus();
 		});
 
 		socket.on('new-chat-connexion', function(pseudo){
-			$(".list-group").prepend("<li class=\"list-group-item info\"> " + pseudo + " viens de se connecter.<span class=\"hour\">" + getTime() + "</span></li>");
+			$(".card-content").prepend("<li class=\"list-group-item info\"> " + pseudo + " viens de se connecter.<span class=\"hour\">" + getTime() + "</span></li>");
 		});
 
 		socket.on('new-message',function(data){
 			if(data.pseudo!=pseudo){
-				$(".list-group").prepend("<li class=\"list-group-item\"><span class=\"badge badge-primary\"> "+ data.pseudo +" </span>"+ data.message +"<span class=\"hour\">" + getTime() + "</span></li>");
+				$(".card-content").prepend("<li class=\"list-group-item\"><span class=\"badge badge-primary\"> "+ data.pseudo +" </span>"+ data.message +"<span class=\"hour\">" + getTime() + "</span></li>");
 			}
 		});
 	});

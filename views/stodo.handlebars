@@ -1,4 +1,4 @@
-<div id="todo">
+<div id="todo" class="container">
 
 	<h1>Ma todolist</h1>
 
@@ -6,7 +6,7 @@
 		<div class="card-header">
 			Mes tâches :
 		</div>
-		<ul class="list-group list-group-flush">
+		<ul class="card-content list-group list-group-flush">
 
 		</ul>
 	</div>
@@ -25,20 +25,19 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+	$("#nav-stodo").addClass("active");
+
 	var socket = io.connect('http://localhost:8080');
 	var todolist = [];
 
 	socket.on('pseudo', function(pseudo) {
 
-		console.log("Arrivé sur la todolist avec le pseudo : " + pseudo);
-
 		socket.emit('new-todo-connexion');
 
 		socket.on('new-todo-connexion', function(nTodolist){
 
-			todolist = nTodolist;
 
-			console.log("Liste : " + todolist);
+			todolist = nTodolist;
 
 			afficherListe(todolist);
 
@@ -60,10 +59,6 @@
 				afficherListe(todolist);
 			});
 
-			$("input[type='checkbox']").change( function(){
-				console.log(this.value);
-				changeStatus(this);
-			});
 		});
 	});
 
@@ -73,9 +68,9 @@
 			$(".list-group").prepend(
 				"<li class=\"list-group-item\">" +
 					"<div class=\"form-check\">" +
-						"<input class=\"form-check-input\" type=\"checkbox\" value=\""+index+"\"" + (value.done?"checked":"") + ">" +
+						"<input class=\"form-check-input\" type=\"checkbox\" value=\""+index+"\" onchange=changeStatus(this) " + (value.done?"checked":"") + ">" +
 						"<label class=\"form-check-label\">" + value.task + "</label>" +
-						"<a class=\"badge badge-danger\" href=\"#\" onclick=remove("+index+")>✘</a>" +
+						"<a class=\"badge badge-delete\" href=\"#\" onclick=remove("+index+")>✘</a>" +
 					"</div>" +
 				"</li>"
 			);
@@ -91,16 +86,13 @@
 	function changeStatus(e){
 		console.log(e.value);
 		if(e.checked) {
-			console.log("La tâche " + todolist[e.value].task + " est effectuée.");
 			todolist[e.value].done = true;
 		} 
 		if(!e.checked) {
-			console.log("La tâche " + todolist[e.value].task + " n'est pas effectuée.");
 			todolist[e.value].done = false;
 		}
 		afficherListe(todolist);
 		socket.emit('list-update',todolist);
-
 	}
 
 </script>

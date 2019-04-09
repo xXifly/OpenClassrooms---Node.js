@@ -11,6 +11,10 @@
   <link rel="stylesheet" type="text/css" href="css/style.css">
 
   <title>Node.js test</title>
+
+    <!-- jQuery et Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -25,10 +29,10 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item active"><a class="nav-link" href="/">Accueil <span class="sr-only">(current)</span></a></li>
-        <li class="nav-item" style="display: none;"><a class="nav-link" href="/todo">Todo List Personnelle</a></li>
-        <li class="nav-item" style="display: none;"><a class="nav-link" href="/chat">Super Chat</a></li>
-        <li class="nav-item" style="display: none;"><a class="nav-link" href="/stodo">Todo List Partagée</a></li>
+        <li id="nav-home" class="nav-item"><a class="nav-link" href="/">Accueil <span class="sr-only">(current)</span></a></li>
+        <li id="nav-todo" class="nav-item" style="display: none;"><a class="nav-link" href="/todo">Todo List Personnelle</a></li>
+        <li id="nav-chat" class="nav-item" style="display: none;"><a class="nav-link" href="/chat">Super Chat</a></li>
+        <li id="nav-stodo" class="nav-item" style="display: none;"><a class="nav-link" href="/stodo">Todo List Partagée</a></li>
       </ul>
       <div class="connexion-form" style="display: none;" action="/" method="post">
         <form id="connexion-form" class="form-inline my-2 my-lg-0">
@@ -45,15 +49,13 @@
     </div>
   </nav>
 
-  <div class="container">
 
-    {{{body}}}
 
-  </div>
+  {{{body}}}
 
-  <!-- jQuery et Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+
+
   <script src="/socket.io/socket.io.js"></script>
   <script>
     var socket = io.connect('http://localhost:8080');

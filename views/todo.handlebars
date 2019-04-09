@@ -1,4 +1,4 @@
-<div id="todo">
+<div id="todo" class="container">
 
 	<h1>Ma todolist</h1>
 
@@ -6,9 +6,12 @@
 		<div class="card-header">
 			Mes tâches :
 		</div>
-		<ul class="list-group list-group-flush">
+		<ul class="card-content list-group list-group-flush">
 			{{#each list}}
-				<li class="list-group-item"> <a href="/todo/supprimer/{{@index}}">✘</a>  {{this}}</li>
+				<li class="list-group-item">
+					<label class="form-check-label"> {{this}} </label>
+					<a class="badge badge-delete" href="/todo/supprimer/{{@index}}">✘</a>
+				</li>
 			{{/each}}
 		</ul>
 	</div>
@@ -24,3 +27,7 @@
 	</div>
 
 </div>
+
+<script type="text/javascript">
+	$("#nav-todo").addClass("active");
+</script>
