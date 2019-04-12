@@ -22,6 +22,45 @@
                 <a class="nav-link" href="/stodo">Todo List Partagée</a>
             </li>
         </ul>
+        <div class="connexion-form" style="display: none;">
+            <div id="connexion-form" class="form-inline my-2 my-lg-0">
+                <input id="pseudo" class="form-control mr-sm-2" name="pseudo" type="text" placeholder="Pseudo"
+                    aria-label="Pseudo">
+                <input id="login" class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Connexion" />
+            </div>
+        </div>
+        <div class="disconnection-form" style="display: none;">
+            <div id="disconnection-form" class="form-inline my-2 my-lg-0">
+                <label id="pDisplay" class="form-control mr-sm-2" for="pseudo"></label>
+                <input id="logout" class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Déconnexion" />
+            </div>
+        </div>
     </div>
-    
+
 </nav>
+
+<script type="text/javascript">
+    var socket = io.connect('http://localhost:3000');
+    var mPseudo;
+    socket.on('pseudo', function (pseudo) {
+        mPseudo = pseudo;
+        if (pseudo) {
+            console.log("VOus etes connecté : " + pseudo);
+            $("#pDisplay").empty();
+            $("#pDisplay").prepend(pseudo);
+            $(".connexion-form").hide();
+            $(".disconnection-form").show();
+            $(".nav-item").show();
+        } else {
+            console.log("VOus etes déconnecté : " + pseudo);
+            $(".connexion-form").show();
+            $(".disconnection-form").hide();
+        }
+    });
+    $("#connexion-form").click(function () {
+        socket.emit('login', $("#pseudo").val());
+    });
+    $("#disconnection-form").click(function () {
+        socket.emit('logout', mPseudo);
+    });
+</script>

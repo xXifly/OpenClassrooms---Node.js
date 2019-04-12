@@ -16,21 +16,23 @@ var app = express();
 app.engine('hbs', exphbs({ extname: '.hbs', defaultLayout: 'main' }));
 app.set('view engine', 'hbs');
 
-app.use(
-  sassMiddleware({
-    src: __dirname + '/sass',
-    dest: __dirname + '/public',
-    debug: true,
-  })
-);
+// app.use(
+//   sassMiddleware({
+//     src: __dirname + '/sass',
+//     dest: __dirname + '/public',
+//     debug: true,
+//   })
+// );
 
-app.use(
-  session({
-    secret: "my-secret",
-    resave: true,
-    saveUninitialized: true
-  })
-);
+
+var sessionMiddleware = session({
+  secret: "my-secret",
+  resave: true,
+  saveUninitialized: true
+});
+
+app.use(sessionMiddleware);
+//io.use(ios(sessionMiddleware));
 
 app.use(logger('dev'));
 app.use(express.json());
